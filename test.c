@@ -5,13 +5,17 @@
 
 int main()
 {
-	//Configure ports as input or output 
-    DDRB    |= _BV(DDB0);
+	//Configure PB0 as output, rest as input
+    DDRB    = 0b00000000;
+    PORTB   = 0b00000000;
+
+    //DDRB    = 0b00000000;
+    //PORTB   = 0b00000000;
 
     while(1)
     {
         PORTB ^= _BV(PB0);
-        _delay_ms(5000);
+        _delay_ms(500);
     }
 
 }
