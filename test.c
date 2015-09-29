@@ -5,9 +5,9 @@
 
 int main()
 {
-	//Configure PB0 as output, rest as input
-    DDRB    = 0b00000000;
-    PORTB   = 0b00000000;
+	//0 = input, 1 = output
+    DDRB    = 0b00000001;
+    PORTB   = 0b00000001;
 
     //DDRB    = 0b00000000;
     //PORTB   = 0b00000000;
