@@ -36,7 +36,7 @@ int main(void)
 		pressure2 = ADCW;
 
 
-		if (pressure1 < 512)
+		if (pressure1 < 800)
 		{
 			PORT_OFF(PORTD,7); // Toggle LEDs
 			PORT_ON (PORTD,6);
@@ -47,7 +47,7 @@ int main(void)
 			PORT_OFF (PORTD,6);
 		}
 
-		if(pressure2 < 512)
+		if(pressure2 < 800)
 		{
 			PORT_OFF(PORTB,1);
 			PORT_ON(PORTB,2);
