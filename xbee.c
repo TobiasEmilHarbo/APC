@@ -3,6 +3,8 @@
 #include <util/delay.h>
 #include <avr/io.h>
 
+typedef unsigned char BYTE;
+
 //Method declarations
 void receiveData(void); 
 unsigned char uart_receiveByte (void);
@@ -10,11 +12,16 @@ unsigned char uart_receiveByte (void);
 void transmitData(unsigned char);
 void uart_transmitByte (unsigned char);
 
+int readSignalStrength(BYTE byte);
+void readSignalOnPin(void);
+
 // define baudrate for serial communication
 #define BAUD 9600                               // define baud
 #define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)        // set baud rate value for UBRR
   
 unsigned char data;
+
+int signalStrength; // Variable to hold ADC result
 
 // function to initialize UART
 void uart_init (void)
@@ -43,11 +50,22 @@ int main (void)
 	PORTC=0x00;									//set all outputs to 0
 	
 	uart_init();
+
+	ADCSRA = (1<<ADEN) | (1<<ADPS2) | (1<<ADPS0);       // ADEN: Set to turn on ADC , by default it is turned off
+        												// ADPS2: ADPS2 and ADPS0 set to make division factor 32
 	
 	while(1){
+		readSignalOnPin();
 		receiveData();
-		//transmitData();
-		_delay_ms(500);
+		
+		if (signalStrength < 1023){
+			transmitData('0');
+		}
+
+		if (signalStrength = 1023){
+			transmitData('1');
+		}
+		_delay_ms(1000);
 	}
 }
 
@@ -67,4 +85,20 @@ void receiveData (void)
 void transmitData (unsigned char data)
 {
 	uart_transmitByte(data);
+}
+
+int readSignalStrength(BYTE byte)
+{
+        ADMUX = byte;// ADC input channel set to pin specified by 'byte'
+        ADCSRA |= (1<<ADSC); // Start conversion
+        while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
+ 
+        return ADCW;
+}
+
+void readSignalOnPin(void)
+{      
+
+    signalStrength = readSignalStrength(0b00000100); //PC0
+
 }
