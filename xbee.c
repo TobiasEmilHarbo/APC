@@ -56,7 +56,7 @@ void receiveData (void)
 	data = uart_receiveByte();
 
 	if(data=='1'){
-		PORTC=0b00100000;						//turn on LED if received character is '1'
+		PORTC=0b00100000;						//turn on LED if recieved character is '1'
 	}
 	else 
 	{	
