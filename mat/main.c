@@ -26,22 +26,22 @@ int main(void)
 	// ADEN: Set to turn on ADC , by default it is turned off
 	// ADPS2: ADPS2 and ADPS0 set to make division factor 32
 
-	int baseThreshold = 600;
+	int baseThreshold = 500;
 
-	int adjustThresholdTopA = 0;
-	int adjustThresholdTopB = 0;
-	int adjustThresholdTopC = 0;
-	int adjustThresholdTopD = 0;
+	int adjustThresholdTopA = 69;
+	int adjustThresholdTopB = 8;
+	int adjustThresholdTopC = -135;
+	int adjustThresholdTopD = 5;
 
-	int adjustThresholdMidA = -150;
-	int adjustThresholdMidB = -150;
-	int adjustThresholdMidC = -150;
-	int adjustThresholdMidD = -150;
+	int adjustThresholdMidA = -76;
+	int adjustThresholdMidB = -101;
+	int adjustThresholdMidC = -203;
+	int adjustThresholdMidD = -91;
 
-	int adjustThresholdBotA = -280;
-	int adjustThresholdBotB = -280;
-	int adjustThresholdBotC = -280;
-	int adjustThresholdBotD = -280;
+	int adjustThresholdBotA = -196;
+	int adjustThresholdBotB = -193;
+	int adjustThresholdBotC = -265;
+	int adjustThresholdBotD = -143;
 
 	while (1)
 	{
