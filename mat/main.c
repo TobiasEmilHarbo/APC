@@ -26,12 +26,17 @@ int main(void)
 	// ADEN: Set to turn on ADC , by default it is turned off
 	// ADPS2: ADPS2 and ADPS0 set to make division factor 32
 
-	int baseThreshold = 1000;
+	int baseThreshold = 600;
 
 	int adjustThresholdA = 0;
 	int adjustThresholdB = 0;
 	int adjustThresholdC = 0;
 	int adjustThresholdD = 0;
+
+	int pressureThredholdA = (baseThreshold + adjustThresholdA);
+	int pressureThredholdB = (baseThreshold + adjustThresholdB);
+	int pressureThredholdC = (baseThreshold + adjustThresholdC);
+	int pressureThredholdD = (baseThreshold + adjustThresholdD);
 
 	while (1)
 	{
@@ -39,9 +44,9 @@ int main(void)
 		pressureB = readPressure(0b00000001); //PC1
 		pressureC = readPressure(0b00000010); //PC2
 		pressureD = readPressure(0b00000011); //PC3
+/*
 
-
-		if (pressureA < (baseThreshold + adjustThresholdA))
+		if (pressureA > (baseThreshold + adjustThresholdA))
 		{
 			PORT_OFF(PORTB,0);
 			PORT_ON(PORTD,7);
@@ -52,7 +57,7 @@ int main(void)
 			PORT_OFF(PORTD,7);
 		}
 
-		if (pressureB < (baseThreshold + adjustThresholdB))
+		if (pressureB > (baseThreshold + adjustThresholdB))
 		{
 			PORT_ON(PORTD,5);
 			PORT_OFF(PORTD,6);
@@ -62,26 +67,47 @@ int main(void)
 			PORT_OFF(PORTD,5); // Toggle LEDs
 			PORT_ON(PORTD,6);
 		}
-
-		if (pressureC < (baseThreshold + adjustThresholdC))
+*/
+		if (pressureC > pressureThredholdC)
+		{
+			PORT_ON(PORTB,7);
+			PORT_ON(PORTB,6);
+		}
+/*		else if (pressureC > pressureThredholdC - 150)
+		{
+			PORT_ON(PORTB,7);
+			PORT_OFF(PORTB,6);
+		}
+		else if (pressureC > pressureThredholdC - 280)
 		{
 			PORT_OFF(PORTB,7);
 			PORT_ON(PORTB,6);
 		}
 		else
-		{
-			PORT_ON(PORTB,7); // Toggle LEDs
+		{*/
+			PORT_OFF(PORTB,7); // Toggle LEDs
 			PORT_OFF(PORTB,6);
-		}
+//		}
 
-		if (pressureD < (baseThreshold + adjustThresholdD))
+
+		if (pressureD > pressureThredholdD)
 		{
-			PORT_OFF(PORTB,1);
+			PORT_ON(PORTB,1);
+			PORT_ON(PORTB,2);
+		}
+		else if (pressureD > pressureThredholdD - 150)
+		{
+			PORT_ON(PORTB,1); // Toggle LEDs
+			PORT_OFF(PORTB,2);
+		}
+		else if (pressureD > pressureThredholdD - 280)
+		{
+			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_ON(PORTB,2);
 		}
 		else
 		{
-			PORT_ON(PORTB,1); // Toggle LEDs
+			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_OFF(PORTB,2);
 		}
 	}
