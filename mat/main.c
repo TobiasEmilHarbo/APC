@@ -33,10 +33,10 @@ int main(void)
 	int adjustThresholdC = 0;
 	int adjustThresholdD = 0;
 
-	int pressureThredholdA = (baseThreshold + adjustThresholdA);
-	int pressureThredholdB = (baseThreshold + adjustThresholdB);
-	int pressureThredholdC = (baseThreshold + adjustThresholdC);
-	int pressureThredholdD = (baseThreshold + adjustThresholdD);
+	int pressureThresholdA = (baseThreshold + adjustThresholdA);
+	int pressureThresholdB = (baseThreshold + adjustThresholdB);
+	int pressureThresholdC = (baseThreshold + adjustThresholdC);
+	int pressureThresholdD = (baseThreshold + adjustThresholdD);
 
 	while (1)
 	{
@@ -44,63 +44,77 @@ int main(void)
 		pressureB = readPressure(0b00000001); //PC1
 		pressureC = readPressure(0b00000010); //PC2
 		pressureD = readPressure(0b00000011); //PC3
-/*
 
-		if (pressureA > (baseThreshold + adjustThresholdA))
+
+		if (pressureA > pressureThresholdA)
 		{
-			PORT_OFF(PORTB,0);
+			PORT_ON(PORTB,0);
 			PORT_ON(PORTD,7);
-		}
-		else
+		} else if (pressureA > pressureThresholdA - 150)
 		{
 			PORT_ON(PORTB,0);
 			PORT_OFF(PORTD,7);
-		}
-
-		if (pressureB > (baseThreshold + adjustThresholdB))
+		} else if (pressureA > pressureThresholdA - 280)
 		{
+			PORT_OFF(PORTB,0);
+			PORT_ON(PORTD,7);
+		} else
+		{
+			PORT_OFF(PORTB,0);
+			PORT_OFF(PORTD,7);
+		}
+		if (pressureB > pressureThresholdB)
+		{
+			PORT_ON(PORTD,6);
 			PORT_ON(PORTD,5);
+		} else if (pressureB > pressureThresholdB - 150)
+		{
+			PORT_ON(PORTD,6);
+			PORT_OFF(PORTD,5);
+		} else if (pressureB > pressureThresholdB - 280)
+		{
 			PORT_OFF(PORTD,6);
+			PORT_ON(PORTD,5);
 		}
 		else
 		{
-			PORT_OFF(PORTD,5); // Toggle LEDs
-			PORT_ON(PORTD,6);
+			PORT_OFF(PORTD,6); // Toggle LEDs
+			PORT_OFF(PORTD,5);
 		}
-*/
-		if (pressureC > pressureThredholdC)
+
+		if (pressureC > pressureThresholdC)
 		{
 			PORT_ON(PORTB,7);
 			PORT_ON(PORTB,6);
 		}
-/*		else if (pressureC > pressureThredholdC - 150)
+		else if (pressureC > pressureThresholdC - 150)
 		{
 			PORT_ON(PORTB,7);
 			PORT_OFF(PORTB,6);
 		}
-		else if (pressureC > pressureThredholdC - 280)
+		else if (pressureC > pressureThresholdC - 280)
 		{
 			PORT_OFF(PORTB,7);
 			PORT_ON(PORTB,6);
 		}
 		else
-		{*/
+		{
 			PORT_OFF(PORTB,7); // Toggle LEDs
 			PORT_OFF(PORTB,6);
-//		}
+		}
 
 
-		if (pressureD > pressureThredholdD)
+		if (pressureD > pressureThresholdD)
 		{
 			PORT_ON(PORTB,1);
 			PORT_ON(PORTB,2);
 		}
-		else if (pressureD > pressureThredholdD - 150)
+		else if (pressureD > pressureThresholdD - 150)
 		{
 			PORT_ON(PORTB,1); // Toggle LEDs
 			PORT_OFF(PORTB,2);
 		}
-		else if (pressureD > pressureThredholdD - 280)
+		else if (pressureD > pressureThresholdD - 250)
 		{
 			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_ON(PORTB,2);
