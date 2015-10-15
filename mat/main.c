@@ -4,8 +4,7 @@
 typedef unsigned char BYTE;
 
 unsigned int pressureA, pressureB, pressureC, pressureD; // Variable to hold ADC result
-
-int lvlOfDanger = 0;
+int lvlOfDanger, dangerLvlOne, dangerLvlTwo, dangerLvlThree;
 
 int readPressure(BYTE byte)
 {
@@ -37,9 +36,9 @@ int main(void)
 	int baseThreshold = 500;
 
 	int adjustThresholdTopA = 69;
-	int adjustThresholdTopB = 8;
+	int adjustThresholdTopB = -25;
 	int adjustThresholdTopC = -155;
-	int adjustThresholdTopD = -60;
+	int adjustThresholdTopD = -55;
 
 	int adjustThresholdMidA = -76;
 	int adjustThresholdMidB = -101;
@@ -48,11 +47,14 @@ int main(void)
 
 	int adjustThresholdBotA = -196;
 	int adjustThresholdBotB = -193;
-	int adjustThresholdBotC = -265;
+	int adjustThresholdBotC = -275;
 	int adjustThresholdBotD = -185;
 
 	while (1)
 	{
+
+		lvlOfDanger = 0;
+
 		pressureA = readPressure(0b00000000); //PC0
 		pressureB = readPressure(0b00000001); //PC1
 		pressureC = readPressure(0b00000010); //PC2
@@ -187,13 +189,6 @@ int main(void)
 
 			setLvlOfDanger(0);
 		}
-/*
-		if(lvlOfDanger == 3) {
-			PORT_ON(PORTD,1);
-		} else if(lvlOfDanger == 2) {
-			PORT_ON*/
-
-	//}
 
 		PORT_OFF(PORTD,1);
 		PORT_OFF(PORTD,2);
@@ -215,7 +210,5 @@ int main(void)
 				PORT_ON(PORTD,1);
 			break;
 		}
-
-		lvlOfDanger = 0;
 	}
 }
