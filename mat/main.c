@@ -5,6 +5,8 @@ typedef unsigned char BYTE;
 
 unsigned int pressureA, pressureB, pressureC, pressureD; // Variable to hold ADC result
 
+int lvlOfDanger = 0;
+
 int readPressure(BYTE byte)
 {
 	ADMUX = byte;//0x05; // ADC input channel set to PC5
@@ -12,6 +14,12 @@ int readPressure(BYTE byte)
 	while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
 
 	return ADCW;
+}
+
+void setLvlOfDanger(int lvl)
+{
+	if(lvlOfDanger < lvl)
+		lvlOfDanger = lvl;
 }
 
 int main(void)
@@ -30,18 +38,18 @@ int main(void)
 
 	int adjustThresholdTopA = 69;
 	int adjustThresholdTopB = 8;
-	int adjustThresholdTopC = -135;
-	int adjustThresholdTopD = 5;
+	int adjustThresholdTopC = -155;
+	int adjustThresholdTopD = -60;
 
 	int adjustThresholdMidA = -76;
 	int adjustThresholdMidB = -101;
 	int adjustThresholdMidC = -203;
-	int adjustThresholdMidD = -91;
+	int adjustThresholdMidD = -115;
 
 	int adjustThresholdBotA = -196;
 	int adjustThresholdBotB = -193;
 	int adjustThresholdBotC = -265;
-	int adjustThresholdBotD = -143;
+	int adjustThresholdBotD = -185;
 
 	while (1)
 	{
@@ -50,27 +58,40 @@ int main(void)
 		pressureC = readPressure(0b00000010); //PC2
 		pressureD = readPressure(0b00000011); //PC3
 
+		//PORT_ON(PORTD,4);
+		//PORT_ON(PORTD,3);
+		//PORT_ON(PORTD,2);
+		//PORT_ON(PORTD,1);
+
 /* ==== pressure plate A ==== */
 
 		if (pressureA > (baseThreshold + adjustThresholdTopA))
 		{
 			PORT_ON(PORTB,0);
 			PORT_ON(PORTD,7);
+
+			setLvlOfDanger(3);
 		}
 		else if (pressureA > (baseThreshold + adjustThresholdMidA))
 		{
 			PORT_ON(PORTB,0);
 			PORT_OFF(PORTD,7);
+
+			setLvlOfDanger(2);
 		}
 		else if (pressureA > (baseThreshold + adjustThresholdBotA))
 		{
 			PORT_OFF(PORTB,0);
 			PORT_ON(PORTD,7);
+
+			setLvlOfDanger(1);
 		}
 		else
 		{
 			PORT_OFF(PORTB,0);
 			PORT_OFF(PORTD,7);
+
+			setLvlOfDanger(0);
 		}
 
 /* ==== pressure plate B ==== */
@@ -80,21 +101,29 @@ int main(void)
 		{
 			PORT_ON(PORTD,6);
 			PORT_ON(PORTD,5);
+
+			setLvlOfDanger(3);
 		}
 		else if (pressureB > (baseThreshold + adjustThresholdMidB))
 		{
 			PORT_ON(PORTD,6);
 			PORT_OFF(PORTD,5);
+
+			setLvlOfDanger(2);
 		}
 		else if (pressureB > (baseThreshold + adjustThresholdBotB))
 		{
 			PORT_OFF(PORTD,6);
 			PORT_ON(PORTD,5);
+
+			setLvlOfDanger(1);
 		}
 		else
 		{
 			PORT_OFF(PORTD,6); // Toggle LEDs
 			PORT_OFF(PORTD,5);
+
+			setLvlOfDanger(0);
 		}
 
 /* ==== pressure plate C ==== */
@@ -103,21 +132,29 @@ int main(void)
 		{
 			PORT_ON(PORTB,7);
 			PORT_ON(PORTB,6);
+
+			setLvlOfDanger(3);
 		}
 		else if (pressureC > (baseThreshold + adjustThresholdMidC))
 		{
 			PORT_ON(PORTB,7);
 			PORT_OFF(PORTB,6);
+
+			setLvlOfDanger(2);
 		}
 		else if (pressureC > (baseThreshold + adjustThresholdBotC))
 		{
 			PORT_OFF(PORTB,7);
 			PORT_ON(PORTB,6);
+
+			setLvlOfDanger(1);
 		}
 		else
 		{
 			PORT_OFF(PORTB,7); // Toggle LEDs
 			PORT_OFF(PORTB,6);
+
+			setLvlOfDanger(0);
 		}
 
 /* ==== pressure plate D ==== */
@@ -126,21 +163,59 @@ int main(void)
 		{
 			PORT_ON(PORTB,1);
 			PORT_ON(PORTB,2);
+
+			setLvlOfDanger(3);
 		}
 		else if (pressureD > (baseThreshold + adjustThresholdMidD))
 		{
 			PORT_ON(PORTB,1); // Toggle LEDs
 			PORT_OFF(PORTB,2);
+
+			setLvlOfDanger(2);
 		}
 		else if (pressureD > (baseThreshold + adjustThresholdBotD))
 		{
 			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_ON(PORTB,2);
+
+			setLvlOfDanger(1);
 		}
 		else
 		{
 			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_OFF(PORTB,2);
+
+			setLvlOfDanger(0);
 		}
+/*
+		if(lvlOfDanger == 3) {
+			PORT_ON(PORTD,1);
+		} else if(lvlOfDanger == 2) {
+			PORT_ON*/
+
+	//}
+
+		PORT_OFF(PORTD,1);
+		PORT_OFF(PORTD,2);
+		PORT_OFF(PORTD,3);
+		PORT_OFF(PORTD,4);
+
+		switch(lvlOfDanger)
+		{
+			case 0:
+				PORT_ON(PORTD,4);
+			break;
+			case 1:
+				PORT_ON(PORTD,3);
+			break;
+			case 2:
+				PORT_ON(PORTD,2);
+			break;
+			case 3:
+				PORT_ON(PORTD,1);
+			break;
+		}
+
+		lvlOfDanger = 0;
 	}
 }
