@@ -5,6 +5,8 @@
 #define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)
 
 #include <avr/io.h>
+#include <util/delay.h>
+
 #define PORT_ON(port,pin) port |= (1<<pin)
 #define PORT_OFF(port,pin) port &= ~(1<<pin)
 typedef unsigned char BYTE;
@@ -14,6 +16,36 @@ int lvlOfDanger, dangerLvlOne, dangerLvlTwo, dangerLvlThree;
 
 void uart_transmitByte (unsigned char);
 void uart_receiveByte (void);
+void uart_Flush (void);
+unsigned char receivedData;
+
+// function to initialize UART
+void uart_init (void)
+{
+    UBRRH = (BAUDRATE>>8);                      // shift the register right by 8 bits
+    UBRRL = BAUDRATE;                           // set baud rate
+    UCSRB|= (1<<TXEN)|(1<<RXEN);      			// enable receiver and transmitter
+    UCSRC|= (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);   // 8bit data format
+}
+
+void uart_transmitByte (unsigned char transmitterData)
+{
+    while (!(UCSRA & (1<<UDRE)));              // wait while register is free
+    UDR = transmitterData;                                 // load data in the register
+    uart_Flush();
+}
+
+void uart_receiveByte (void)
+{
+	while(!(UCSRA) & (1<<RXC));             		// wait while data is being received
+	receivedData = UDR;                             // return 8-bit data
+}
+
+void uart_Flush(void)
+{
+	unsigned char dummy;
+	while ( UCSRA & (1<<RXC) ) dummy = UDR;
+}
 
 int readPressure(BYTE byte)
 {
@@ -58,21 +90,24 @@ void readDangerLvl()
 	{
 		PORT_ON(PORTD,3);
 	}*/
-	if(dangerLvlThree > 0 || dangerLvlTwo > 1)
+	if(dangerLvlThree > 0 || dangerLvlTwo > 1) //Level 2
 	{
-		PORT_ON(PORTD,1);
-	}
-	else if(dangerLvlTwo > 0)
+		//PORT_ON(PORTD,1);
+		uart_transmitByte('2');
+			}
+	else if(dangerLvlTwo > 0) //Level 1
 	{
-		PORT_ON(PORTD,2);
-	}
-	else if(dangerLvlOne > 0)
+		//PORT_ON(PORTD,2);
+		uart_transmitByte('1');
+			}
+	/*else if(dangerLvlOne > 0)
 	{
 		PORT_ON(PORTD,3);
-	}
-	else
+	}*/
+	else //Neutral
 	{
-		PORT_ON(PORTD,4);
+		//PORT_ON(PORTD,4);
+		uart_transmitByte('0');
 	}
 
 	/*switch(lvlOfDanger)
@@ -103,6 +138,8 @@ int main(void)
 	ADCSRA = (1<<ADEN) | (1<<ADPS2) | (1<<ADPS0);
 	// ADEN: Set to turn on ADC , by default it is turned off
 	// ADPS2: ADPS2 and ADPS0 set to make division factor 32
+
+	uart_init();
 
 	int baseThreshold = 500;
 
@@ -139,7 +176,7 @@ int main(void)
 		//PORT_ON(PORTD,2);
 		//PORT_ON(PORTD,1);
 
-/* ==== pressure plate A ==== */
+		/* ==== pressure plate A ==== */
 
 		if (pressureA > (baseThreshold + adjustThresholdTopA))
 		{
