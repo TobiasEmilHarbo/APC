@@ -17,8 +17,70 @@ int readPressure(BYTE byte)
 
 void setLvlOfDanger(int lvl)
 {
-	if(lvlOfDanger < lvl)
-		lvlOfDanger = lvl;
+	switch(lvl)
+	{
+		case 1:
+			dangerLvlOne++;
+			break;
+		case 2:
+			dangerLvlTwo++;
+			break;
+		case 3:
+			dangerLvlThree++;
+			break;
+	}
+
+	//if(lvlOfDanger < lvl)
+	//	lvlOfDanger = lvl;
+}
+
+void readDangerLvl()
+{
+
+	/*if(dangerLvlThree > 0 || dangerLvlTwo > 1)
+	{
+		PORT_ON(PORTD,1);
+	}
+	else if(dangerLvlTwo > 0)
+	{
+		PORT_ON(PORTD,2);
+	}
+	else if(dangerLvlThree > 0)
+	{
+		PORT_ON(PORTD,3);
+	}*/
+	if(dangerLvlThree > 0 || dangerLvlTwo > 1)
+	{
+		PORT_ON(PORTD,1);
+	}
+	else if(dangerLvlTwo > 0)
+	{
+		PORT_ON(PORTD,2);
+	}
+	else if(dangerLvlOne > 0)
+	{
+		PORT_ON(PORTD,3);
+	}
+	else
+	{
+		PORT_ON(PORTD,4);
+	}
+
+	/*switch(lvlOfDanger)
+	{
+		case 0:
+			PORT_ON(PORTD,4);
+		break;
+		case 1:
+			PORT_ON(PORTD,3);
+		break;
+		case 2:
+			PORT_ON(PORTD,2);
+		break;
+		case 3:
+			PORT_ON(PORTD,1);
+		break;
+	}*/
 }
 
 int main(void)
@@ -35,25 +97,28 @@ int main(void)
 
 	int baseThreshold = 500;
 
-	int adjustThresholdTopA = 69;
-	int adjustThresholdTopB = -25;
-	int adjustThresholdTopC = -155;
-	int adjustThresholdTopD = -55;
+	int adjustThresholdTopA = -38;
+	int adjustThresholdTopB = -127;
+	int adjustThresholdTopC = 93;
+	int adjustThresholdTopD = -207;
 
-	int adjustThresholdMidA = -76;
-	int adjustThresholdMidB = -101;
-	int adjustThresholdMidC = -203;
-	int adjustThresholdMidD = -115;
+	int adjustThresholdMidA = -125;
+	int adjustThresholdMidB = -185;
+	int adjustThresholdMidC = 29;
+	int adjustThresholdMidD = -270;
 
-	int adjustThresholdBotA = -196;
-	int adjustThresholdBotB = -193;
-	int adjustThresholdBotC = -275;
-	int adjustThresholdBotD = -185;
+	/* === not used === */
+	int adjustThresholdBotA = 900;
+	int adjustThresholdBotB = 900;
+	int adjustThresholdBotC = 900;
+	int adjustThresholdBotD = 900;
 
 	while (1)
 	{
-
-		lvlOfDanger = 0;
+		lvlOfDanger 	= 0;
+		dangerLvlOne 	= 0;
+		dangerLvlTwo 	= 0;
+		dangerLvlThree 	= 0;
 
 		pressureA = readPressure(0b00000000); //PC0
 		pressureB = readPressure(0b00000001); //PC1
@@ -195,20 +260,6 @@ int main(void)
 		PORT_OFF(PORTD,3);
 		PORT_OFF(PORTD,4);
 
-		switch(lvlOfDanger)
-		{
-			case 0:
-				PORT_ON(PORTD,4);
-			break;
-			case 1:
-				PORT_ON(PORTD,3);
-			break;
-			case 2:
-				PORT_ON(PORTD,2);
-			break;
-			case 3:
-				PORT_ON(PORTD,1);
-			break;
-		}
+		readDangerLvl();
 	}
 }
