@@ -6,17 +6,17 @@
 
 #include <util/delay.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 //Method declarations
 void uart_transmitByte (unsigned char);
 void uart_receiveByte (void);
-void readSignalOnPin (void);
 
 typedef unsigned char BYTE;
-
 int readSignalStrength(BYTE byte);
-unsigned int signalStrength; // Variable to hold ADC result
+
 unsigned char data, i, receivedData, message[10];
+int prevPulse = 0;	
 
 // function to initialize UART
 void uart_init (void)
@@ -26,6 +26,7 @@ void uart_init (void)
     UCSRB|= (1<<TXEN)|(1<<RXEN);      			// enable receiver and transmitter
     UCSRC|= (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);   // 8bit data format
 }
+
 
 void uart_transmitByte (unsigned char data)
 {
@@ -39,41 +40,44 @@ void uart_receiveByte (void)
 	receivedData = UDR;                             // return 8-bit data
 }
 
-int main (void)
+void StartTimer1(void)
 {
-	DDRB= 0b11111110;									
-	PORTB=0b00000001;									
-	
-	uart_init();
-	 
-	ADCSRA = (1<<ADEN) | (1<<ADPS2) | (1<<ADPS0);       // ADEN: Set to turn on ADC , by default it is turned off
-        												// ADPS2: ADPS2 and ADPS0 set to make division factor 32
-	
-	while(1)
-	{
-		uart_receiveByte();
+	TCNT1=0;
+	//Start timer with prescaller 1024
+	TCCR1B = (1<<CS12)|(0<<CS11)|(1<<CS10);
+}
 
-		signalStrength = readSignalStrength(0b00000011);
-
-		sprintf(message, "%d", signalStrength); //Convert signalStrength to array of chars
-		
-		for(i=0;message[i];i++)
-		{
-			uart_transmitByte(message[i]);
-		}
-		_delay_ms(1000);
+void StopTimer1(void)
+{
+	TCCR1B = (0<<CS12)|(0<<CS11)|(0<<CS10);
+	
+	if(TCNT1 > 10000){
+		uart_transmitByte('c');	
 	}
 }
 
-int readSignalStrength(BYTE byte)
+int main( void)
 {
-        ADMUX = byte;// ADC input channel set to pin specified by 'byte'
-        ADCSRA |= (1<<ADSC); // Start conversion
-        while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
- 
-        return ADCW;
+	uart_init();
+	uart_receiveByte();	
+    
+    while(1)
+    {
+		if(bit_is_set(PINB, 0)){
+			
+			if (prevPulse == 0)
+			{
+				prevPulse = 1;
+				StartTimer1();
+			}
+		}
+		if(bit_is_clear(PINB, 0))
+			if (prevPulse == 1)
+			{
+				prevPulse = 0;
+				StopTimer1();
+			}
+		}
 }
-
-
 
 
