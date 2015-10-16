@@ -14,12 +14,13 @@
 //Method declarations
 void uart_transmitByte (unsigned char);
 void uart_receiveByte (void);
-
+/*
 typedef unsigned char BYTE;
 int readSignalStrength(BYTE byte);
+int signalStrength; // Variable to hold ADC result
+*/
 
-unsigned char data, i, receivedData;
-int prevPulse = 0;	
+unsigned char data, i, receivedData, message[10];
 
 // function to initialize UART
 void uart_init (void)
@@ -62,14 +63,17 @@ void StopTimer1(void)
 int main( void)
 {
 	uart_init();
-
+	
+	_delay_ms(5000);
+	
 	DDRC  = 0b11111111; // Set Port C as Output
 	PORTC = 0b00000000;
+
     
     while(1)
     {
-    	uart_receiveByte();	
 
+    	uart_receiveByte();	
 
     	PORT_OFF(PORTC,5);
     	PORT_OFF(PORTC, 4);
@@ -94,6 +98,12 @@ int main( void)
     		PORT_ON(PORTC, 4);
     		PORT_ON(PORTC, 3);
     	}
+    	else
+    	{
+    		PORT_OFF(PORTC,5);
+    		PORT_OFF(PORTC, 4);
+    		PORT_OFF(PORTC, 3);
+    	}
 
 		/*if(bit_is_set(PINB, 0)){
 			
@@ -111,5 +121,15 @@ int main( void)
 			}*/
 	}
 }
+
+/*
+int readSignalStrength(BYTE byte)
+{
+        ADMUX = byte;// ADC input channel set to pin specified by 'byte'
+        ADCSRA |= (1<<ADSC); // Start conversion
+        while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
+ 
+        return ADCW;
+}*/
 
 
