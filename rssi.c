@@ -44,13 +44,22 @@ void StartTimer1(void)
 {
 	TCNT1=0;
 	//Start timer with prescaller 1024
-	TCCR1B = (1<<CS12)|(0<<CS11)|(1<<CS10);
+	TCCR1B |= (1<<CS12)|(0<<CS11)|(1<<CS10);
+	uart_transmitByte('s');
+	_delay_ms(500);
 }
 
 void StopTimer1(void)
 {
-	TCCR1B = (0<<CS12)|(0<<CS11)|(0<<CS10);
+	TCCR1B |= (0<<CS12)|(0<<CS11)|(0<<CS10);
 	
+	sprintf(message, "%d", TCNT1); //Convert signalStrength to array of chars
+
+	for(i=0;message[i];i++)
+	{
+		uart_transmitByte(message[i]);
+	}
+
 	if(TCNT1 > 10000){
 		uart_transmitByte('c');	
 	}
@@ -70,12 +79,12 @@ int main( void)
 				prevPulse = 1;
 				StartTimer1();
 			}
-		}
-		if(bit_is_clear(PINB, 0))
+
 			if (prevPulse == 1)
 			{
 				prevPulse = 0;
 				StopTimer1();
 			}
 		}
+	}
 }
