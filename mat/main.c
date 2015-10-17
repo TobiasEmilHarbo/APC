@@ -70,61 +70,23 @@ void setLvlOfDanger(int lvl)
 			dangerLvlThree++;
 			break;
 	}
-
-	//if(lvlOfDanger < lvl)
-	//	lvlOfDanger = lvl;
 }
 
 void readDangerLvl()
 {
-
-	/*if(dangerLvlThree > 0 || dangerLvlTwo > 1)
-	{
-		PORT_ON(PORTD,1);
-	}
-	else if(dangerLvlTwo > 0)
-	{
-		PORT_ON(PORTD,2);
-	}
-	else if(dangerLvlThree > 0)
-	{
-		PORT_ON(PORTD,3);
-	}*/
 	if(dangerLvlThree > 0 || dangerLvlTwo > 1) //Level 2
 	{
-		//PORT_ON(PORTD,1);
 		uart_transmitByte('2');
-			}
+	}
 	else if(dangerLvlTwo > 0) //Level 1
 	{
-		//PORT_ON(PORTD,2);
 		uart_transmitByte('1');
-			}
-	/*else if(dangerLvlOne > 0)
-	{
-		PORT_ON(PORTD,3);
-	}*/
+	}
 	else //Neutral
 	{
-		//PORT_ON(PORTD,4);
 		uart_transmitByte('0');
 	}
-
-	/*switch(lvlOfDanger)
-	{
-		case 0:
-			PORT_ON(PORTD,4);
-		break;
-		case 1:
-			PORT_ON(PORTD,3);
-		break;
-		case 2:
-			PORT_ON(PORTD,2);
-		break;
-		case 3:
-			PORT_ON(PORTD,1);
-		break;
-	}*/
+	_delay_ms(100);
 }
 
 int main(void)
@@ -158,6 +120,8 @@ int main(void)
 	int adjustThresholdBotB = 900;
 	int adjustThresholdBotC = 900;
 	int adjustThresholdBotD = 900;
+
+	_delay_ms(500);
 
 	while (1)
 	{
