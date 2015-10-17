@@ -64,7 +64,7 @@ int main( void)
 {
 	uart_init();
 	
-	_delay_ms(5000);
+	_delay_ms(500);
 	
 	DDRC  = 0b11111111; // Set Port C as Output
 	PORTC = 0b00000000;
