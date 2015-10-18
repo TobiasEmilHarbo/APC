@@ -77,16 +77,18 @@ void readDangerLvl()
 	if(dangerLvlThree > 0 || dangerLvlTwo > 1) //Level 2
 	{
 		uart_transmitByte('2');
+		_delay_ms(5500);
 	}
 	else if(dangerLvlTwo > 0) //Level 1
 	{
 		uart_transmitByte('1');
+		_delay_ms(5500);
 	}
 	else //Neutral
 	{
 		uart_transmitByte('0');
+		_delay_ms(100);
 	}
-	_delay_ms(100);
 }
 
 int main(void)
