@@ -107,21 +107,21 @@ int main(void)
 
 	int baseThreshold = 500;
 
-	int adjustThresholdTopA = -38;
-	int adjustThresholdTopB = -127;
-	int adjustThresholdTopC = 93;
-	int adjustThresholdTopD = -207;
+	int adjustThresholdInnerA = -53;
+	int adjustThresholdInnerB = -133;
+	int adjustThresholdInnerC = 102;
+	int adjustThresholdInnerD = -250;
 
-	int adjustThresholdMidA = -125;
-	int adjustThresholdMidB = -185;
-	int adjustThresholdMidC = 29;
-	int adjustThresholdMidD = -270;
+	int adjustThresholdMidA = -150;
+	int adjustThresholdMidB = -199;
+	int adjustThresholdMidC = 13;
+	int adjustThresholdMidD = -305;
 
 	/* === not used === */
-	int adjustThresholdBotA = 900;
-	int adjustThresholdBotB = 900;
-	int adjustThresholdBotC = 900;
-	int adjustThresholdBotD = 900;
+	int adjustThresholdOuterA = 1023;
+	int adjustThresholdOuterB = 1023;
+	int adjustThresholdOuterC = 1023;
+	int adjustThresholdOuterD = 1023;
 
 	_delay_ms(500);
 
@@ -144,7 +144,7 @@ int main(void)
 
 		/* ==== pressure plate A ==== */
 
-		if (pressureA > (baseThreshold + adjustThresholdTopA))
+		if (pressureA > (baseThreshold + adjustThresholdInnerA))
 		{
 			PORT_ON(PORTB,0);
 			PORT_ON(PORTD,7);
@@ -158,7 +158,7 @@ int main(void)
 
 			setLvlOfDanger(2);
 		}
-		else if (pressureA > (baseThreshold + adjustThresholdBotA))
+		else if (pressureA > (baseThreshold + adjustThresholdOuterA))
 		{
 			PORT_OFF(PORTB,0);
 			PORT_ON(PORTD,7);
@@ -176,7 +176,7 @@ int main(void)
 /* ==== pressure plate B ==== */
 
 
-		if (pressureB > (baseThreshold + adjustThresholdTopB))
+		if (pressureB > (baseThreshold + adjustThresholdInnerB))
 		{
 			PORT_ON(PORTD,6);
 			PORT_ON(PORTD,5);
@@ -190,7 +190,7 @@ int main(void)
 
 			setLvlOfDanger(2);
 		}
-		else if (pressureB > (baseThreshold + adjustThresholdBotB))
+		else if (pressureB > (baseThreshold + adjustThresholdOuterB))
 		{
 			PORT_OFF(PORTD,6);
 			PORT_ON(PORTD,5);
@@ -207,7 +207,7 @@ int main(void)
 
 /* ==== pressure plate C ==== */
 
-		if (pressureC > (baseThreshold + adjustThresholdTopC))
+		if (pressureC > (baseThreshold + adjustThresholdInnerC))
 		{
 			PORT_ON(PORTB,7);
 			PORT_ON(PORTB,6);
@@ -221,7 +221,7 @@ int main(void)
 
 			setLvlOfDanger(2);
 		}
-		else if (pressureC > (baseThreshold + adjustThresholdBotC))
+		else if (pressureC > (baseThreshold + adjustThresholdOuterC))
 		{
 			PORT_OFF(PORTB,7);
 			PORT_ON(PORTB,6);
@@ -238,7 +238,7 @@ int main(void)
 
 /* ==== pressure plate D ==== */
 
-		if (pressureD > (baseThreshold + adjustThresholdTopD))
+		if (pressureD > (baseThreshold + adjustThresholdInnerD))
 		{
 			PORT_ON(PORTB,1);
 			PORT_ON(PORTB,2);
@@ -252,7 +252,7 @@ int main(void)
 
 			setLvlOfDanger(2);
 		}
-		else if (pressureD > (baseThreshold + adjustThresholdBotD))
+		else if (pressureD > (baseThreshold + adjustThresholdOuterD))
 		{
 			PORT_OFF(PORTB,1); // Toggle LEDs
 			PORT_ON(PORTB,2);
