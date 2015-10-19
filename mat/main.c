@@ -12,7 +12,7 @@
 typedef unsigned char BYTE;
 
 unsigned int pressureA, pressureB, pressureC, pressureD; // Variable to hold ADC result
-int lvlOfDanger, dangerLvlOne, dangerLvlTwo, dangerLvlThree;
+int dangerLvlOne, dangerLvlTwo, dangerLvlThree;
 
 void uart_transmitByte (unsigned char);
 void uart_receiveByte (void);
@@ -66,20 +66,17 @@ void setLvlOfDanger(int lvl)
 		case 2:
 			dangerLvlTwo++;
 			break;
-		case 3:
-			dangerLvlThree++;
-			break;
 	}
 }
 
 void readDangerLvl()
 {
-	if(dangerLvlThree > 0 || dangerLvlTwo > 1) //Level 2
+	if(dangerLvlTwo > 0 || dangerLvlOne > 1) //Level 2
 	{
 		uart_transmitByte('2');
 		_delay_ms(5500);
 	}
-	else if(dangerLvlTwo > 0) //Level 1
+	else if(dangerLvlOne > 0) //Level 1
 	{
 		uart_transmitByte('1');
 		_delay_ms(5500);
@@ -107,40 +104,27 @@ int main(void)
 
 	int baseThreshold = 500;
 
-	int adjustThresholdInnerA = -53;
+	int adjustThresholdInnerA = -105;
 	int adjustThresholdInnerB = -133;
-	int adjustThresholdInnerC = 102;
-	int adjustThresholdInnerD = -250;
+	int adjustThresholdInnerC = 147;
+	int adjustThresholdInnerD = -289;
 
-	int adjustThresholdMidA = -150;
-	int adjustThresholdMidB = -199;
-	int adjustThresholdMidC = 13;
-	int adjustThresholdMidD = -305;
-
-	/* === not used === */
-	int adjustThresholdOuterA = 1023;
-	int adjustThresholdOuterB = 1023;
-	int adjustThresholdOuterC = 1023;
-	int adjustThresholdOuterD = 1023;
+	int adjustThresholdOuterA = -220;
+	int adjustThresholdOuterB = -199;
+	int adjustThresholdOuterC = 107;
+	int adjustThresholdOuterD = -353;
 
 	_delay_ms(500);
 
-	while (1)
+	while(1)
 	{
-		lvlOfDanger 	= 0;
 		dangerLvlOne 	= 0;
 		dangerLvlTwo 	= 0;
-		dangerLvlThree 	= 0;
 
 		pressureA = readPressure(0b00000000); //PC0
 		pressureB = readPressure(0b00000001); //PC1
 		pressureC = readPressure(0b00000010); //PC2
 		pressureD = readPressure(0b00000011); //PC3
-
-		//PORT_ON(PORTD,4);
-		//PORT_ON(PORTD,3);
-		//PORT_ON(PORTD,2);
-		//PORT_ON(PORTD,1);
 
 		/* ==== pressure plate A ==== */
 
@@ -149,19 +133,12 @@ int main(void)
 			PORT_ON(PORTB,0);
 			PORT_ON(PORTD,7);
 
-			setLvlOfDanger(3);
-		}
-		else if (pressureA > (baseThreshold + adjustThresholdMidA))
-		{
-			PORT_ON(PORTB,0);
-			PORT_OFF(PORTD,7);
-
 			setLvlOfDanger(2);
 		}
 		else if (pressureA > (baseThreshold + adjustThresholdOuterA))
 		{
-			PORT_OFF(PORTB,0);
-			PORT_ON(PORTD,7);
+			PORT_ON(PORTB,0);
+			PORT_OFF(PORTD,7);
 
 			setLvlOfDanger(1);
 		}
@@ -181,19 +158,12 @@ int main(void)
 			PORT_ON(PORTD,6);
 			PORT_ON(PORTD,5);
 
-			setLvlOfDanger(3);
-		}
-		else if (pressureB > (baseThreshold + adjustThresholdMidB))
-		{
-			PORT_ON(PORTD,6);
-			PORT_OFF(PORTD,5);
-
 			setLvlOfDanger(2);
 		}
 		else if (pressureB > (baseThreshold + adjustThresholdOuterB))
 		{
-			PORT_OFF(PORTD,6);
-			PORT_ON(PORTD,5);
+			PORT_ON(PORTD,6);
+			PORT_OFF(PORTD,5);
 
 			setLvlOfDanger(1);
 		}
@@ -212,19 +182,12 @@ int main(void)
 			PORT_ON(PORTB,7);
 			PORT_ON(PORTB,6);
 
-			setLvlOfDanger(3);
-		}
-		else if (pressureC > (baseThreshold + adjustThresholdMidC))
-		{
-			PORT_ON(PORTB,7);
-			PORT_OFF(PORTB,6);
-
 			setLvlOfDanger(2);
 		}
 		else if (pressureC > (baseThreshold + adjustThresholdOuterC))
 		{
-			PORT_OFF(PORTB,7);
-			PORT_ON(PORTB,6);
+			PORT_ON(PORTB,7);
+			PORT_OFF(PORTB,6);
 
 			setLvlOfDanger(1);
 		}
@@ -243,19 +206,12 @@ int main(void)
 			PORT_ON(PORTB,1);
 			PORT_ON(PORTB,2);
 
-			setLvlOfDanger(3);
-		}
-		else if (pressureD > (baseThreshold + adjustThresholdMidD))
-		{
-			PORT_ON(PORTB,1); // Toggle LEDs
-			PORT_OFF(PORTB,2);
-
 			setLvlOfDanger(2);
 		}
 		else if (pressureD > (baseThreshold + adjustThresholdOuterD))
 		{
-			PORT_OFF(PORTB,1); // Toggle LEDs
-			PORT_ON(PORTB,2);
+			PORT_ON(PORTB,1); // Toggle LEDs
+			PORT_OFF(PORTB,2);
 
 			setLvlOfDanger(1);
 		}
@@ -266,11 +222,6 @@ int main(void)
 
 			setLvlOfDanger(0);
 		}
-
-		PORT_OFF(PORTD,1);
-		PORT_OFF(PORTD,2);
-		PORT_OFF(PORTD,3);
-		PORT_OFF(PORTD,4);
 
 		readDangerLvl();
 	}
