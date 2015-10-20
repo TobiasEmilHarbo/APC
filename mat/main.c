@@ -49,7 +49,7 @@ void uart_Flush(void)
 
 int readPressure(BYTE byte)
 {
-	ADMUX = byte;//0x05; // ADC input channel set to PC5
+	ADMUX = byte; // ADC input channel set
 	ADCSRA |= (1<<ADSC); // Start conversion
 	while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
 
@@ -90,7 +90,7 @@ void readDangerLvl()
 
 int main(void)
 {
-	DDRD  = 0b11111101; // Set Port D as Output
+	DDRD  = 0b11111101; // Set Port D - RX as Output
 	PORTD = 0b00000010;
 
 	DDRB = 0b11111111; // Set Port B as Output
@@ -130,22 +130,22 @@ int main(void)
 
 		if (pressureA > (baseThreshold + adjustThresholdInnerA))
 		{
-			PORT_ON(PORTB,0);
-			PORT_ON(PORTD,7);
+			PORT_ON(PORTB,0); //debug
+			PORT_ON(PORTD,7); //debug
 
 			setLvlOfDanger(2);
 		}
 		else if (pressureA > (baseThreshold + adjustThresholdOuterA))
 		{
-			PORT_ON(PORTB,0);
-			PORT_OFF(PORTD,7);
+			PORT_ON(PORTB,0); //debug
+			PORT_OFF(PORTD,7); //debug
 
 			setLvlOfDanger(1);
 		}
 		else
 		{
-			PORT_OFF(PORTB,0);
-			PORT_OFF(PORTD,7);
+			PORT_OFF(PORTB,0); //debug
+			PORT_OFF(PORTD,7); //debug
 
 			setLvlOfDanger(0);
 		}
@@ -155,22 +155,22 @@ int main(void)
 
 		if (pressureB > (baseThreshold + adjustThresholdInnerB))
 		{
-			PORT_ON(PORTD,6);
-			PORT_ON(PORTD,5);
+			PORT_ON(PORTD,6); //debug
+			PORT_ON(PORTD,5); //debug
 
 			setLvlOfDanger(2);
 		}
 		else if (pressureB > (baseThreshold + adjustThresholdOuterB))
 		{
-			PORT_ON(PORTD,6);
-			PORT_OFF(PORTD,5);
+			PORT_ON(PORTD,6); //debug
+			PORT_OFF(PORTD,5); //debug
 
 			setLvlOfDanger(1);
 		}
 		else
 		{
-			PORT_OFF(PORTD,6); // Toggle LEDs
-			PORT_OFF(PORTD,5);
+			PORT_OFF(PORTD,6); //debug
+			PORT_OFF(PORTD,5); //debug
 
 			setLvlOfDanger(0);
 		}
