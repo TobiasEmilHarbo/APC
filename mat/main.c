@@ -1,3 +1,4 @@
+//define the clockrate to fit the ATmega8L
 #define F_CPU 4000000UL 
 
 // define baudrate for serial communication
@@ -7,6 +8,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+//Used for turning specific pins on specific ports on and off
 #define PORT_ON(port,pin) port |= (1<<pin)
 #define PORT_OFF(port,pin) port &= ~(1<<pin)
 typedef unsigned char BYTE;
@@ -28,25 +30,29 @@ void uart_init (void)
     UCSRC|= (1<<URSEL)|(1<<UCSZ0)|(1<<UCSZ1);   // 8bit data format
 }
 
+//function to transmit an unsigned char via XBees
 void uart_transmitByte (unsigned char transmitterData)
 {
     while (!(UCSRA & (1<<UDRE)));              // wait while register is free
-    UDR = transmitterData;                                 // load data in the register
+    UDR = transmitterData;                     // load data in the register
     uart_Flush();
 }
 
+//function to recieve bytes via XBees
 void uart_receiveByte (void)
 {
-	while(!(UCSRA) & (1<<RXC));             		// wait while data is being received
-	receivedData = UDR;                             // return 8-bit data
+	while(!(UCSRA) & (1<<RXC));           	   // wait while data is being received
+	receivedData = UDR;                        // return 8-bit data
 }
 
+//function to clean out the uart
 void uart_Flush(void)
 {
 	unsigned char dummy;
 	while ( UCSRA & (1<<RXC) ) dummy = UDR;
 }
 
+//read the pressure from a given port on the ATmega8L
 int readPressure(BYTE byte)
 {
 	ADMUX = byte; // ADC input channel set
@@ -56,6 +62,7 @@ int readPressure(BYTE byte)
 	return ADCW;
 }
 
+//set the level of danger determined by how high the pressure is
 void setLvlOfDanger(int lvl)
 {
 	switch(lvl)
@@ -69,6 +76,7 @@ void setLvlOfDanger(int lvl)
 	}
 }
 
+//read the danger level and transmit to the bracelet via XBees
 void readDangerLvl()
 {
 	if(dangerLvlTwo > 0 || dangerLvlOne > 1) //Level 2
@@ -102,6 +110,8 @@ int main(void)
 
 	uart_init();
 
+	/* === Pressure sensors calibration === */
+
 	int baseThreshold = 500;
 
 	int adjustThresholdInnerA = -105;
@@ -118,9 +128,11 @@ int main(void)
 
 	while(1)
 	{
+		//reset danger levels before each reading
 		dangerLvlOne 	= 0;
 		dangerLvlTwo 	= 0;
 
+		//read each pressure sensor
 		pressureA = readPressure(0b00000000); //PC0
 		pressureB = readPressure(0b00000001); //PC1
 		pressureC = readPressure(0b00000010); //PC2
@@ -133,6 +145,7 @@ int main(void)
 			PORT_ON(PORTB,0); //debug
 			PORT_ON(PORTD,7); //debug
 
+			//The pressure is high - set dangerlevel = 2
 			setLvlOfDanger(2);
 		}
 		else if (pressureA > (baseThreshold + adjustThresholdOuterA))
@@ -140,6 +153,7 @@ int main(void)
 			PORT_ON(PORTB,0); //debug
 			PORT_OFF(PORTD,7); //debug
 
+			//The pressure is medium - set dangerlevel = 1
 			setLvlOfDanger(1);
 		}
 		else
@@ -147,10 +161,11 @@ int main(void)
 			PORT_OFF(PORTB,0); //debug
 			PORT_OFF(PORTD,7); //debug
 
+			//The pressure is low - set dangerlevel = 0
 			setLvlOfDanger(0);
 		}
 
-/* ==== pressure plate B ==== */
+		/* ==== pressure plate B ==== */
 
 
 		if (pressureB > (baseThreshold + adjustThresholdInnerB))
@@ -158,6 +173,7 @@ int main(void)
 			PORT_ON(PORTD,6); //debug
 			PORT_ON(PORTD,5); //debug
 
+			//The pressure is high - set dangerlevel = 2
 			setLvlOfDanger(2);
 		}
 		else if (pressureB > (baseThreshold + adjustThresholdOuterB))
@@ -165,6 +181,7 @@ int main(void)
 			PORT_ON(PORTD,6); //debug
 			PORT_OFF(PORTD,5); //debug
 
+			//The pressure is medium - set dangerlevel = 1
 			setLvlOfDanger(1);
 		}
 		else
@@ -172,57 +189,65 @@ int main(void)
 			PORT_OFF(PORTD,6); //debug
 			PORT_OFF(PORTD,5); //debug
 
+			//The pressure is low - set dangerlevel = 0
 			setLvlOfDanger(0);
 		}
 
-/* ==== pressure plate C ==== */
+		/* ==== pressure plate C ==== */
 
 		if (pressureC > (baseThreshold + adjustThresholdInnerC))
 		{
-			PORT_ON(PORTB,7);
-			PORT_ON(PORTB,6);
+			PORT_ON(PORTB,7); //debug
+			PORT_ON(PORTB,6); //debug
 
+			//The pressure is high - set dangerlevel = 2
 			setLvlOfDanger(2);
 		}
 		else if (pressureC > (baseThreshold + adjustThresholdOuterC))
 		{
-			PORT_ON(PORTB,7);
-			PORT_OFF(PORTB,6);
+			PORT_ON(PORTB,7); //debug
+			PORT_OFF(PORTB,6); //debug
 
+			//The pressure is medium - set dangerlevel = 1
 			setLvlOfDanger(1);
 		}
 		else
 		{
-			PORT_OFF(PORTB,7); // Toggle LEDs
-			PORT_OFF(PORTB,6);
+			PORT_OFF(PORTB,7); //debug
+			PORT_OFF(PORTB,6); //debug
 
+			//The pressure is low - set dangerlevel = 0
 			setLvlOfDanger(0);
 		}
 
-/* ==== pressure plate D ==== */
+		/* ==== pressure plate D ==== */
 
 		if (pressureD > (baseThreshold + adjustThresholdInnerD))
 		{
-			PORT_ON(PORTB,1);
-			PORT_ON(PORTB,2);
+			PORT_ON(PORTB,1); //debug
+			PORT_ON(PORTB,2); //debug
 
+			//The pressure is high - set dangerlevel = 2
 			setLvlOfDanger(2);
 		}
 		else if (pressureD > (baseThreshold + adjustThresholdOuterD))
 		{
-			PORT_ON(PORTB,1); // Toggle LEDs
-			PORT_OFF(PORTB,2);
+			PORT_ON(PORTB,1); //debug
+			PORT_OFF(PORTB,2); //debug
 
+			//The pressure is medium - set dangerlevel = 1
 			setLvlOfDanger(1);
 		}
 		else
 		{
-			PORT_OFF(PORTB,1); // Toggle LEDs
-			PORT_OFF(PORTB,2);
+			PORT_OFF(PORTB,1); //debug
+			PORT_OFF(PORTB,2); //debug
 
+			//The pressure is low - set dangerlevel = 0
 			setLvlOfDanger(0);
 		}
 
+		//transmit the dangerlevel to bracelet via XBees
 		readDangerLvl();
 	}
 }
