@@ -5,6 +5,7 @@
 #define BAUD 9600                               
 #define BAUDRATE ((F_CPU)/(BAUD*16UL)-1)
 
+//libraries
 #include <avr/io.h>
 #include <util/delay.h>
 
