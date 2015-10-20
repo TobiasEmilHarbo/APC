@@ -14,11 +14,6 @@
 //Method declarations
 void uart_transmitByte (unsigned char);
 void uart_receiveByte (void);
-/*
-typedef unsigned char BYTE;
-int readSignalStrength(BYTE byte);
-int signalStrength; // Variable to hold ADC result
-*/
 
 unsigned char data, i, receivedData, message[10];
 
@@ -43,24 +38,67 @@ void uart_receiveByte (void)
 	while(!(UCSRA) & (1<<RXC));             		// wait while data is being received
 	receivedData = UDR;                             // return 8-bit data
 }
-/*
-void StartTimer1(void)
+
+void vibrate (char i)
 {
-	TCNT1=0;
-	//Start timer with prescaller 1024
-	TCCR1B = (1<<CS12)|(0<<CS11)|(1<<CS10);
+
+	switch(i)
+    {
+    case '1' :
+            //vibration
+            PORT_ON(PORTB,1);
+            _delay_ms(1000);
+            PORT_OFF(PORTB,1);
+            _delay_ms(1000);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(1000);
+            PORT_OFF(PORTB,1);
+            _delay_ms(1000);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(1000);
+            PORT_OFF(PORTB,1);
+            _delay_ms(1000);
+
+            break;
+    case '2' :
+            //vibration
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+
+            PORT_ON(PORTB,1);
+            _delay_ms(500);
+            PORT_OFF(PORTB,1);
+            _delay_ms(500);
+            
+            break;
+    }
 }
 
-void StopTimer1(void)
-{
-	TCCR1B = (0<<CS12)|(0<<CS11)|(0<<CS10);
-	
-	if(TCNT1 > 10000){
-		uart_transmitByte('c');	
-	}
-}*/
-
-int main( void)
+int main(void)
 {
 	uart_init();
 	
@@ -69,67 +107,29 @@ int main( void)
 	DDRC  = 0b11111111; // Set Port C as Output
 	PORTC = 0b00000000;
 
+	DDRB  = 0b11111110; // Set Port C as Output
+	PORTB = 0b00000001;
     
     while(1)
     {
 
     	uart_receiveByte();	
-
-    	PORT_OFF(PORTC,5);
-    	PORT_OFF(PORTC, 4);
-    	PORT_OFF(PORTC, 3);
     	
     	if(receivedData == '0')
     	{
-    		PORT_ON(PORTC,5);
-    		PORT_OFF(PORTC, 4);
-    		PORT_OFF(PORTC, 3);
+    		//do nothing
     	}
     	else if(receivedData == '1')
     	{
-    		PORT_ON(PORTC,5);
-    		PORT_ON(PORTC, 4);
-    		PORT_OFF(PORTC, 3);
+    		vibrate('1');
     	}
     	
     	else if(receivedData == '2')
     	{
-    		PORT_ON(PORTC,5);
-    		PORT_ON(PORTC, 4);
-    		PORT_ON(PORTC, 3);
-    	}
-    	else
-    	{
-    		PORT_OFF(PORTC,5);
-    		PORT_OFF(PORTC, 4);
-    		PORT_OFF(PORTC, 3);
-    	}
 
-		/*if(bit_is_set(PINB, 0)){
-			
-			if (prevPulse == 0)
-			{
-				prevPulse = 1;
-				StartTimer1();
-			}
-		}
-		if(bit_is_clear(PINB, 0))
-			if (prevPulse == 1)
-			{
-				prevPulse = 0;
-				StopTimer1();
-			}*/
+    		vibrate('2');
+    	}
 	}
 }
-
-/*
-int readSignalStrength(BYTE byte)
-{
-        ADMUX = byte;// ADC input channel set to pin specified by 'byte'
-        ADCSRA |= (1<<ADSC); // Start conversion
-        while (ADCSRA & (1<<ADSC)); // wait for conversion to complete
- 
-        return ADCW;
-}*/
 
 
